@@ -119,8 +119,8 @@ if(document.modelContext?.registerTool){try{Promise.resolve(document.modelContex
     const company = isCompany();
     if (label) label.textContent = company ? 'CNPJ' : 'CPF';
     if (help) help.textContent = company
-      ? 'Informe o CNPJ. A validação é feita antes de continuar.'
-      : 'Informe o CPF. A validação é feita antes de continuar.';
+      ? 'Digite o CNPJ completo. Ao informar o último número, os dados da empresa serão consultados automaticamente.'
+      : 'Digite o CPF completo. Ao informar o último número, o nome será consultado automaticamente.';
     const nameLabel=document.getElementById('customer-name-label');
     const nameInput=document.getElementById('customer-name');
     if(nameLabel) nameLabel.textContent=company?'Nome do responsável':'Nome completo';
@@ -157,53 +157,86 @@ if(document.modelContext?.registerTool){try{Promise.resolve(document.modelContex
 })();
 
 
-// V4.2 — consulta segura de CPF via Cloudflare Pages Function
+// V4.4 — CPF/CNPJ automático ao completar o documento
 (() => {
- const btn=document.getElementById('consult-cpf');
  const status=document.getElementById('cpf-lookup-status');
  const doc=document.getElementById('customer-document');
  const name=document.getElementById('customer-name');
- const box=document.getElementById('cpf-lookup');
- if(!btn||!doc||!name)return;
+ const companyName=document.getElementById('company');
+ if(!doc||!name)return;
 
  const digits=v=>String(v||'').replace(/\D/g,'');
  const isCompany=()=>document.querySelector('input[name="kind"]:checked')?.value==='empresa';
+ let lastKey='', controller=null;
 
- function sync(){
-   if(box) box.hidden=isCompany();
-   if(status) status.textContent='';
+ function setStatus(text,state=''){
+   if(!status)return;
+   status.textContent=text;
+   status.dataset.state=state;
  }
- document.querySelectorAll('input[name="kind"]').forEach(x=>x.addEventListener('change',sync));
- sync();
 
- btn.addEventListener('click',async()=>{
-   const cpf=digits(doc.value);
+ function clearAutoFields(){
+   if(isCompany()){
+     if(companyName) companyName.value='';
+     name.value='';
+   }else{
+     name.value='';
+   }
+ }
+
+ async function lookup(){
+   const company=isCompany(), raw=digits(doc.value);
+   const needed=company?14:11;
+   if(raw.length!==needed){ lastKey=''; setStatus(''); return; }
+
    const validator=window.ADMDocumentValidator;
-   if(cpf.length!==11 || (validator && !validator.validCPF(cpf))){
-     status.textContent='Informe um CPF válido primeiro.';
-     status.dataset.state='error';
-     doc.focus();
-     return;
-   }
-   btn.disabled=true;
-   status.textContent='Consultando…';
-   status.dataset.state='loading';
+   const valid=company ? (!validator||validator.validCNPJ(raw)) : (!validator||validator.validCPF(raw));
+   if(!valid){ lastKey=''; setStatus(company?'CNPJ inválido. Confira os números.':'CPF inválido. Confira os números.','error'); return; }
+
+   const key=(company?'cnpj:':'cpf:')+raw;
+   if(key===lastKey)return;
+   lastKey=key;
+   if(controller) controller.abort();
+   controller=new AbortController();
+   setStatus(company?'Consultando CNPJ…':'Consultando CPF…','loading');
+
    try{
-     const r=await fetch('/api/consultar-cpf?cpf='+encodeURIComponent(cpf),{
-       method:'GET',
-       headers:{'Accept':'application/json'}
-     });
+     const endpoint=company?'/api/consultar-cnpj?cnpj=':'/api/consultar-cpf?cpf=';
+     const r=await fetch(endpoint+encodeURIComponent(raw),{headers:{Accept:'application/json'},signal:controller.signal});
      const data=await r.json().catch(()=>({}));
-     if(!r.ok || !data.success || !data.name) throw new Error(data.message||'Não foi possível consultar o CPF.');
-     name.value=data.name;
-     name.dispatchEvent(new Event('input',{bubbles:true}));
-     status.textContent='CPF localizado. Nome preenchido ✓';
-     status.dataset.state='success';
+     if(!r.ok||!data.success) throw new Error(data.message||'Não foi possível consultar o documento.');
+
+     if(company){
+       if(companyName && data.razao_social){
+         companyName.value=data.razao_social;
+         companyName.dispatchEvent(new Event('input',{bubbles:true}));
+       }
+       // BrasilAPI não retorna "nome do responsável pelo orçamento".
+       // Mantemos esse campo para o cliente preencher manualmente.
+       name.value='';
+       setStatus('CNPJ localizado. Dados da empresa preenchidos ✓','success');
+     }else{
+       if(!data.name) throw new Error('Nome não encontrado para este CPF.');
+       name.value=data.name;
+       name.dispatchEvent(new Event('input',{bubbles:true}));
+       setStatus('CPF localizado. Nome preenchido ✓','success');
+     }
    }catch(e){
-     status.textContent=e.message||'Consulta indisponível. Digite o nome manualmente.';
-     status.dataset.state='error';
-   }finally{
-     btn.disabled=false;
+     if(e.name==='AbortError')return;
+     lastKey='';
+     setStatus(e.message||'Consulta indisponível. Preencha os dados manualmente.','error');
    }
+ }
+
+ doc.addEventListener('input',()=>{
+   const raw=digits(doc.value), needed=isCompany()?14:11;
+   if(raw.length<needed){lastKey='';setStatus('');}
+   if(raw.length===needed) setTimeout(lookup,0);
  });
-})();
+
+ document.querySelectorAll('input[name="kind"]').forEach(el=>el.addEventListener('change',()=>{
+   lastKey='';
+   setStatus('');
+   clearAutoFields();
+ }));
+})();;

@@ -77,3 +77,33 @@ input.invalid-document{border-color:#b42318!important;box-shadow:0 0 0 3px rgba(
 .cpf-lookup-status[data-state="success"]{color:#18794e}
 .cpf-lookup-status[data-state="error"]{color:#b42318}
 .cpf-lookup-status[data-state="loading"]{color:var(--blue)}
+
+
+/* V4.5 — identificação pelo documento primeiro */
+.document-first{
+  margin-top:18px;
+  padding:18px;
+  border:1px solid rgba(20,70,130,.16);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(240,247,255,.95),rgba(255,255,255,.98));
+}
+.document-first > label{font-weight:800;font-size:1.02rem}
+.document-first input{
+  font-size:1.12rem;
+  font-weight:700;
+  letter-spacing:.025em;
+  min-height:52px;
+}
+.cpf-lookup-status{display:block;margin-top:8px;font-weight:700;min-height:20px}
+.cpf-lookup-status[data-state="loading"]::before{content:"↻ ";display:inline-block}
+.cpf-lookup-status[data-state="success"]{color:#137333}
+.cpf-lookup-status[data-state="error"]{color:#b3261e}
+.identity-details{margin-top:14px}
+#customer-name[readonly],#company[readonly]{
+  background:#f3f7f4;
+  border-color:rgba(19,115,51,.25);
+}
+@media(max-width:640px){
+  .document-first{padding:15px;border-radius:15px}
+  .profile-dialog .welcome-form{padding-left:18px;padding-right:18px}
+}

@@ -61,16 +61,19 @@
 <form id="profile-form">
 <div id="profile-step-one">
 <fieldset class="customer-type"><legend>O orçamento é para</legend><label><input type="radio" name="kind" value="cliente" checked><span><b>Cliente</b><small>Para você e sua obra</small></span></label><label><input type="radio" name="kind" value="empresa"><span><b>Empresa</b><small>Para o seu negócio</small></span></label></fieldset>
-<div id="company-field" hidden><label for="company">Nome da empresa</label><input id="company" name="company" autocomplete="organization" maxlength="100" disabled></div><div id="document-field"><label for="customer-document" id="document-label">CPF</label><input id="customer-document" name="document" inputmode="numeric" autocomplete="off" maxlength="18" required placeholder="000.000.000-00"><small class="field-help" id="document-help">Informe o CPF para identificação do orçamento.</small>
+<div id="document-field" class="document-first">
+<label for="customer-document" id="document-label">CPF</label>
+<input id="customer-document" name="document" inputmode="numeric" autocomplete="off" maxlength="18" required placeholder="000.000.000-00">
+<small class="field-help" id="document-help">Primeiro, digite seu CPF. Ao completar os 11 números, buscamos seu nome automaticamente.</small>
 <small class="field-error" id="document-error" hidden></small>
-<small class="document-privacy-note">Usamos o documento somente para identificar o orçamento. Os demais dados são preenchidos por você.</small>
-<div class="cpf-lookup" id="cpf-lookup">
-<button type="button" class="button ghost cpf-search-button" id="consult-cpf">Consultar CPF</button>
-<span id="cpf-lookup-status" class="cpf-lookup-status" aria-live="polite"></span>
-</div></div>
-<label for="customer-name" id="customer-name-label">Seu nome</label><input id="customer-name" name="name" autocomplete="name" required minlength="2" maxlength="100" placeholder="Como você gostaria de ser chamado?">
-<label for="customer-phone">WhatsApp</label><input id="customer-phone" name="phone" autocomplete="tel" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="(43) 99999-9999">
-<label for="customer-email">E-mail <span>(opcional)</span></label><input id="customer-email" name="email" autocomplete="email" type="email" autocomplete="email" maxlength="120" placeholder="seuemail@exemplo.com">
+<div class="cpf-lookup" id="cpf-lookup"><span id="cpf-lookup-status" class="cpf-lookup-status" aria-live="polite"></span></div>
+</div>
+<div id="identity-details" class="identity-details">
+<div id="company-field" hidden><label for="company">Razão social / Empresa</label><input id="company" name="company" autocomplete="organization" maxlength="100" disabled readonly></div>
+<label for="customer-name" id="customer-name-label">Nome completo</label><input id="customer-name" name="name" autocomplete="name" required minlength="2" maxlength="100" placeholder="Nome completo">
+<label for="customer-phone">WhatsApp</label><input id="customer-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="(43) 99999-9999">
+<label for="customer-email">E-mail <span>(opcional)</span></label><input id="customer-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="seuemail@exemplo.com">
+</div>
 <button type="button" class="button blue continue-button" id="profile-next">Continuar para entrega →</button>
 <button type="button" class="browse-first" data-close="profile-dialog">Quero conhecer o catálogo primeiro</button>
 </div>
