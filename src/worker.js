@@ -1,4 +1,3 @@
-import { admin, recordVisit, cleanup } from './analytics.js';
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -41,6 +40,17 @@ function validCNPJ(value) {
   const d1 = calc(cnpj.slice(0, 12));
   const d2 = calc(cnpj.slice(0, 12) + d1);
   return d1 === Number(cnpj[12]) && d2 === Number(cnpj[13]);
+}
+
+async function consultarCEP(request) {
+ const url=new URL(request.url), cep=(url.searchParams.get("cep")||"").replace(/\D/g,"");
+ if(cep.length!==8)return json({success:false,message:"CEP inválido."},400);
+ try{
+  const r=await fetch("https://brasilapi.com.br/api/cep/v1/"+encodeURIComponent(cep),{headers:{"accept":"application/json"}});
+  const b=await r.json().catch(()=>null);
+  if(!r.ok||!b)return json({success:false,message:r.status===404?"CEP não encontrado.":"Não foi possível consultar o CEP agora."},r.status>=400?r.status:502);
+  return json({success:true,cep:b.cep||cep,state:b.state||"",city:b.city||"",neighborhood:b.neighborhood||"",street:b.street||""});
+ }catch{return json({success:false,message:"Consulta de CEP indisponível. Preencha manualmente."},502)}
 }
 
 async function consultarCNPJ(request) {
@@ -96,26 +106,17 @@ async function consultarCPF(request, env) {
 }
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
-      try { return await admin(request, env); }
-      catch { return new Response('Painel temporariamente indisponível.', {status:503, headers:{'cache-control':'no-store'}}); }
-    }
     if (request.method === "GET" && url.pathname === "/api/consultar-cpf") {
       return consultarCPF(request, env);
     }
     if (request.method === "GET" && url.pathname === "/api/consultar-cnpj") {
       return consultarCNPJ(request);
     }
-    const response = await env.ASSETS.fetch(request);
-    if (request.method === 'GET' && ['/', '/index.html'].includes(url.pathname) && response.status === 200 && response.headers.get('content-type')?.includes('text/html')) {
-      ctx.waitUntil(recordVisit(request, env).catch(() => console.error('analytics_write_failed')));
+    if (request.method === "GET" && url.pathname === "/api/consultar-cep") {
+      return consultarCEP(request);
     }
-    return response;
-  },
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(cleanup(env));
+    return env.ASSETS.fetch(request);
   }
 };
-
