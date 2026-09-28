@@ -3,13 +3,13 @@
   "name": "adm-artefatos",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-25",
+
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
-  }
-}
-{
+  },
+
   "observability": {
     "logs": {
       "enabled": true,
