@@ -1,3 +1,4 @@
+import { admin, recordVisit, cleanup } from './analytics.js';
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -95,14 +96,26 @@ async function consultarCPF(request, env) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+      try { return await admin(request, env); }
+      catch { return new Response('Painel temporariamente indisponível.', {status:503, headers:{'cache-control':'no-store'}}); }
+    }
     if (request.method === "GET" && url.pathname === "/api/consultar-cpf") {
       return consultarCPF(request, env);
     }
     if (request.method === "GET" && url.pathname === "/api/consultar-cnpj") {
       return consultarCNPJ(request);
     }
-    return env.ASSETS.fetch(request);
+    const response = await env.ASSETS.fetch(request);
+    if (request.method === 'GET' && ['/', '/index.html'].includes(url.pathname) && response.status === 200 && response.headers.get('content-type')?.includes('text/html')) {
+      ctx.waitUntil(recordVisit(request, env).catch(() => console.error('analytics_write_failed')));
+    }
+    return response;
+  },
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(cleanup(env));
   }
 };
+
