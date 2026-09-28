@@ -240,3 +240,30 @@ if(document.modelContext?.registerTool){try{Promise.resolve(document.modelContex
    clearAutoFields();
  }));
 })();;
+
+// V4.6 — CEP automático e progresso visual
+(() => {
+ const cep=document.getElementById('delivery-cep'), status=document.getElementById('cep-status');
+ if(!cep)return;
+ const digits=v=>String(v||'').replace(/\D/g,''); let last='', controller=null;
+ const field=(ids,names=[])=>{for(const id of ids){const e=document.getElementById(id);if(e)return e}for(const n of names){const e=document.querySelector(`[name="${n}"]`);if(e)return e}return null};
+ const street=field(['delivery-street','delivery-address'],['street','address','logradouro']);
+ const neighborhood=field(['delivery-neighborhood','delivery-district'],['neighborhood','bairro']);
+ const city=field(['delivery-city'],['city','cidade']);
+ const state=field(['delivery-state'],['state','uf']);
+ const fill=(e,v)=>{if(e&&v){e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))}};
+ async function lookup(){
+   const raw=digits(cep.value); if(raw.length!==8||raw===last)return; last=raw;
+   if(controller)controller.abort(); controller=new AbortController();
+   if(status){status.textContent='Consultando CEP…';status.dataset.state='loading'}
+   try{
+     const r=await fetch('/api/consultar-cep?cep='+raw,{headers:{Accept:'application/json'},signal:controller.signal});
+     const d=await r.json().catch(()=>({})); if(!r.ok||!d.success)throw new Error(d.message||'CEP não localizado.');
+     fill(street,d.street);fill(neighborhood,d.neighborhood);fill(city,d.city);fill(state,d.state);
+     if(status){status.textContent='Endereço localizado e preenchido ✓';status.dataset.state='success'}
+   }catch(e){if(e.name==='AbortError')return;last='';if(status){status.textContent=e.message||'Preencha o endereço manualmente.';status.dataset.state='error'}}
+ }
+ cep.addEventListener('input',()=>{let r=digits(cep.value).slice(0,8);cep.value=r.length>5?r.slice(0,5)+'-'+r.slice(5):r;if(r.length===8)setTimeout(lookup,0);else{last='';if(status){status.dataset.state='';status.textContent='Digite o CEP para preencher o endereço automaticamente.'}}});
+ const two=document.getElementById('profile-step-two'), dots=[...document.querySelectorAll('[data-step-dot]')], p=document.getElementById('profile-progress');
+ if(two)new MutationObserver(()=>{const s2=!two.hidden;dots.forEach((d,i)=>d.classList.toggle('active',i<=(s2?1:0)));if(p)p.textContent=s2?'02 · OBRA / ENTREGA':'01 · IDENTIFICAÇÃO'}).observe(two,{attributes:true,attributeFilter:['hidden']});
+})();

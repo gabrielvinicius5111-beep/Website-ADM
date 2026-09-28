@@ -58,7 +58,7 @@
 <dialog id="profile-dialog" class="profile-dialog" aria-labelledby="profile-title">
 <div class="welcome-side"><img src="assets/LOGO%20ADM.png" alt="A.D.M. Artefatos de Cimento"><p class="eyebrow">BEM-VINDO À A.D.M.</p><h2>Vamos construir<br>essa parceria.</h2><p>Conte para quem é o orçamento e onde sua obra vai acontecer.</p><div class="welcome-foot">Seus materiais.<br>Suas medidas.<br>Seu orçamento.</div></div>
 <div class="welcome-form"><div class="dialog-head"><div><p class="eyebrow" id="profile-progress">01 · IDENTIFICAÇÃO</p><h2 id="profile-title">Como podemos te atender?</h2></div><button class="icon-button" data-close="profile-dialog" aria-label="Fechar identificação">×</button></div>
-<form id="profile-form">
+<div class="profile-progressbar" aria-hidden="true"><span class="progress-dot active" data-step-dot="1">1</span><i></i><span class="progress-dot" data-step-dot="2">2</span></div><div class="progress-labels"><span>Identificação</span><span>Obra / entrega</span></div><form id="profile-form">
 <div id="profile-step-one">
 <fieldset class="customer-type"><legend>O orçamento é para</legend><label><input type="radio" name="kind" value="cliente" checked><span><b>Cliente</b><small>Para você e sua obra</small></span></label><label><input type="radio" name="kind" value="empresa"><span><b>Empresa</b><small>Para o seu negócio</small></span></label></fieldset>
 <div id="document-field" class="document-first">
@@ -83,7 +83,7 @@
 <label><input type="radio" name="purpose" value="entrega"><span><b>Materiais + entrega</b><small>Produtos e consulta de entrega/frete</small></span></label>
 <label><input type="radio" name="purpose" value="obra"><span><b>Serviço / obra</b><small>Construção civil, pavimentação ou terraplanagem</small></span></label>
 </fieldset>
-<p class="step-intro">Informe o local da obra ou da entrega.</p><div class="form-grid"><div><label for="delivery-cep">CEP <span>(opcional)</span></label><input id="delivery-cep" name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000"></div><div><label for="delivery-state">Estado</label><select id="delivery-state" name="state" autocomplete="address-level1" required><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div></div>
+<p class="step-intro">Informe o local da obra ou da entrega.</p><div class="form-grid"><div><label for="delivery-cep">CEP</label><input id="delivery-cep" name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000"><small id="cep-status" class="cep-status" aria-live="polite">Digite o CEP para preencher o endereço automaticamente.</small></div><div><label for="delivery-state">Estado</label><select id="delivery-state" name="state" autocomplete="address-level1" required><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div></div>
 <label for="delivery-city">Cidade</label><input id="delivery-city" name="city" autocomplete="address-level2" required maxlength="80">
 <label for="delivery-street">Rua, avenida ou local da obra</label><input id="delivery-street" name="street" autocomplete="address-line1" required maxlength="140">
 <div class="form-grid"><div><label for="delivery-number">Número ou S/N</label><input id="delivery-number" name="number" required maxlength="20"></div><div><label for="delivery-district">Bairro / região</label><input id="delivery-district" name="district" required maxlength="80"></div></div>
@@ -93,7 +93,5 @@
 </form></div></dialog>
 <a class="whatsapp-float" href="https://wa.me/5543998319629?text=Olá%2C%20gostaria%20de%20mais%20informações%20sobre%20a%20A.D.M." target="_blank" rel="noopener" aria-label="Falar com a A.D.M. pelo WhatsApp"><span>WhatsApp</span> ↗</a>
 <div class="site-version" aria-hidden="true">ADM WEB V4</div>
-</body>
-<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "64476fa08e844e9faccfd78f65298008"}'></script><!-- End Cloudflare Web Analytics -->
-</html>
+</body></html>
 

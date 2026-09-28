@@ -107,3 +107,7 @@ input.invalid-document{border-color:#b42318!important;box-shadow:0 0 0 3px rgba(
   .document-first{padding:15px;border-radius:15px}
   .profile-dialog .welcome-form{padding-left:18px;padding-right:18px}
 }
+
+/* V4.6 */
+.profile-progressbar{display:flex;align-items:center;gap:10px;margin:2px 0 4px}.profile-progressbar i{height:3px;flex:1;background:#dce5ef;border-radius:99px}.progress-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e8edf3;color:#657282;font-weight:800}.progress-dot.active{background:#0f4f91;color:#fff}.progress-labels{display:flex;justify-content:space-between;color:#6a7480;font-size:.76rem;font-weight:700;margin-bottom:16px}.cep-status{display:block;min-height:20px;margin-top:6px;font-weight:650}.cep-status[data-state="success"]{color:#137333}.cep-status[data-state="error"]{color:#b3261e}
+@media(max-width:640px){.profile-dialog{width:min(100% - 16px,720px);max-height:94dvh}.welcome-side{display:none}.welcome-form{width:100%;padding:18px!important}.welcome-form input,.welcome-form select,.welcome-form textarea{min-height:50px;font-size:16px}.continue-button{width:100%;min-height:52px}.customer-type,.quote-purpose{grid-template-columns:1fr!important}}
