@@ -3,20 +3,32 @@
   "name": "adm-artefatos",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-25",
-
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
   },
-
   "observability": {
     "logs": {
-      "enabled": true,
-      "invocation_logs": true
+      "enabled": false,
+      "invocation_logs": false
     },
     "traces": {
-      "enabled": true
+      "enabled": false
     }
+  },
+  "d1_databases": [
+    {
+      "binding": "ANALYTICS_DB",
+      "database_name": "adm-analytics",
+      "migrations_dir": "migrations",
+      "database_id": "SUBSTITUA_PELO_ID_DO_D1"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "15 3 * * *"
+    ]
   }
 }
